@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Day Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .result-container {
+            display: none;
+            margin-top: 2rem;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .prediction-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #ffcc00;
+        }
+        
+        .prediction-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .prediction-score {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        
+        .processing {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffcc00;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .parallax-item {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="parallax-bg" id="parallaxBg"></div>
+
+    <div class="container">
+        <header>
+            <h1>Next Day Prediction</h1>
+            <p class="subtitle">Discover what tomorrow holds for you</p>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" placeholder="Enter your name">
+            </div>
+
+            <div class="input-group">
+                <label for="mood">Today's Mood</label>
+                <select id="mood">
+                    <option value="happy">Happy</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="stressed">Stressed</option>
+                    <option value="energetic">Energetic</option>
+                    <option value="tired">Tired</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="activities">Today's Main Activities</label>
+                <textarea id="activities" placeholder="Describe your main activities today..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="goals">Tomorrow's Goals</label>
+                <textarea id="goals" placeholder="What do you hope to accomplish tomorrow?"></textarea>
+            </div>
+
+            <button id="predictBtn">Predict My Next Day</button>
+
+            <div class="processing" id="processing">
+                <div class="spinner"></div>
+                <p>Analyzing your data and predicting tomorrow...</p>
+            </div>
+        </div>
+
+        <div class="card result-container" id="resultContainer">
+            <h2 class="prediction-title">Your Next Day Prediction</h2>
+            <div class="prediction-text" id="predictionText"></div>
+            <div class="prediction-score" id="predictionScore"></div>
+            <button id="resetBtn">Make Another Prediction</button>
+        </div>
+
+        <footer>
+            <p>Next Day Prediction &copy; 2023 | This app provides entertainment purposes only</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create parallax background elements
+        const parallaxBg = document.getElementById('parallaxBg');
+        for (let i = 0; i < 15; i++) {
+            const item = document.createElement('div');
+            item.className = 'parallax-item';
+            const size = Math.random() * 60 + 20;
+            item.style.width = `${size}px`;
+            item.style.height = `${size}px`;
+            item.style.left = `${Math.random() * 100}%`;
+            item.style.top = `${Math.random() * 100}%`;
+            item.style.animationDuration = `${Math.random() * 20 + 10}s`;
+            item.style.animationDelay = `${Math.random() * 5}s`;
+            parallaxBg.appendChild(item);
+        }
+
+        // DOM elements
+        const predictBtn = document.getElementById('predictBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const processing = document.getElementById('processing');
+        const resultContainer = document.getElementById('resultContainer');
+        const predictionText = document.getElementById('predictionText');
+        const predictionScore = document.getElementById('predictionScore');
+
+        // Prediction data
+        const predictions = {
+            happy: [
+                "Your positive energy will carry into tomorrow! Expect productive work sessions and pleasant surprises throughout the day.",
+                "Your cheerful disposition will attract good opportunities. Keep an eye out for unexpected connections that could lead to exciting projects.",
+                "Your happiness is contagious! Tomorrow will bring moments of joy and accomplishment in both personal and professional areas."
+            ],
+            neutral: [
+                "Tomorrow will be a balanced day with steady progress on your tasks. Look for small moments of inspiration in routine activities.",
+                "A calm and collected approach will serve you well tomorrow. Expect moderate productivity with opportunities for learning.",
+                "Your neutral mindset will help you navigate tomorrow's challenges with clarity. Important decisions made today will show positive results."
+            ],
+            stressed: [
+                "Tomorrow offers a chance to reset. Focus on one task at a time and don't hesitate to ask for help when needed.",
+                "Your stress today will transform into motivation tomorrow. Tackle the most challenging tasks first thing in the morning.",
+                "Take a deep breath - tomorrow will bring clarity to the issues causing stress today. Solutions will present themselves when you least expect."
+            ],
+            energetic: [
+                "Channel that energy! Tomorrow is perfect for tackling big projects and making significant progress toward your goals.",
+                "Your high energy levels will help you power through tomorrow's tasks with efficiency. Consider starting with physical activity to maintain momentum.",
+                "This burst of energy will carry into tomorrow, making it an excellent day for networking, creative work, and tackling challenges head-on."
+            ],
+            tired: [
+                "A good night's rest will rejuvenate you for tomorrow. Pace yourself and focus on quality over quantity in your work.",
+                "Tomorrow will bring a fresh perspective. Listen to your body and take breaks when needed - productivity will come in waves.",
+                "Your fatigue today will make way for renewed energy tomorrow. Important insights may come to you after a period of rest."
+            ]
+        };
+
+        const positivityScores = {
+            happy: [85, 92, 88],
+            neutral: [70, 65, 72],
+            stressed: [45, 55, 60],
+            energetic: [90, 85, 88],
+            tired: [60, 65, 58]
+        };
+
+        // Event listeners
+        predictBtn.addEventListener('click', predictNextDay);
+        resetBtn.addEventListener('click', resetForm);
+
+        // Prediction function
+        function predictNextDay() {
+            const name = document.getElementById('name').value || "Friend";
+            const mood = document.getElementById('mood').value;
+            const activities = document.getElementById('activities').value;
+            const goals = document.getElementById('goals').value;
+
+            // Show processing animation
+            processing.style.display = 'block';
+
+            // Simulate processing time
+            setTimeout(() => {
+                // Hide processing
+                processing.style.display = 'none';
+
+                // Generate prediction
+                const moodIndex = Math.floor(Math.random() * 3);
+                const prediction = predictions[mood][moodIndex];
+                const score = positivityScores[mood][moodIndex];
+
+                // Customize prediction with user data
+                let personalizedPrediction = prediction;
+                if (activities) {
+                    personalizedPrediction += ` Your activities today will influence tomorrow's outcomes positively.`;
+                }
+                if (goals) {
+                    personalizedPrediction += ` Your focus on "${goals}" will yield noticeable progress.`;
+                }
+
+                // Display results
+                predictionText.textContent = personalizedPrediction;
+                predictionScore.textContent = `Positivity Score: ${score}%`;
+                resultContainer.style.display = 'block';
+
+                // Scroll to results
+                resultContainer.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }, 3000);
+        }
+
+        // Reset form function
+        function resetForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('mood').value = 'happy';
+            document.getElementById('activities').value = '';
+            document.getElementById('goals').value = '';
+            resultContainer.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>
