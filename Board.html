@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspirational Quote Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .quote-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .quote-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        #quote-text {
+            font-size: 1.8rem;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 25px;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            font-weight: 500;
+        }
+        
+        #quote-author {
+            font-size: 1.3rem;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 35px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #tweet-quote {
+            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+        }
+        
+        .instructions {
+            color: white;
+            margin-top: 30px;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            #quote-text {
+                font-size: 1.4rem;
+            }
+            .quote-box {
+                padding: 25px;
+            }
+            button {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>✨ Inspirational Quote Generator</h1>
+
+        <div class="quote-box">
+            <div id="quote-text" class="fade-in">Click the button for daily inspiration!</div>
+            <div id="quote-author" class="fade-in"></div>
+
+            <div class="buttons">
+                <button id="new-quote">New Quote</button>
+                <button id="tweet-quote">Tweet Quote</button>
+            </div>
+        </div>
+
+        <p class="instructions">Press Spacebar for a new quote • Click to tweet your favorites</p>
+    </div>
+
+    <script>
+        const quotes = [{
+            text: "The only way to do great work is to love what you do.",
+            author: "Steve Jobs"
+        }, {
+            text: "Innovation distinguishes between a leader and a follower.",
+            author: "Steve Jobs"
+        }, {
+            text: "Your time is limited, so don't waste it living someone else's life.",
+            author: "Steve Jobs"
+        }, {
+            text: "The future belongs to those who believe in the beauty of their dreams.",
+            author: "Eleanor Roosevelt"
+        }, {
+            text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+            author: "Winston Churchill"
+        }, {
+            text: "The way to get started is to quit talking and begin doing.",
+            author: "Walt Disney"
+        }, {
+            text: "Don't let yesterday take up too much of today.",
+            author: "Will Rogers"
+        }, {
+            text: "You learn more from failure than from success. Don't let it stop you.",
+            author: "Unknown"
+        }, {
+            text: "The harder you work for something, the greater you'll feel when you achieve it.",
+            author: "Unknown"
+        }, {
+            text: "Dream bigger. Do bigger.",
+            author: "Unknown"
+        }, {
+            text: "It's not whether you get knocked down, it's whether you get up.",
+            author: "Vince Lombardi"
+        }, {
+            text: "If you are working on something that you really care about, you don't have to be pushed.",
+            author: "Steve Jobs"
+        }, {
+            text: "The only place where success comes before work is in the dictionary.",
+            author: "Vidal Sassoon"
+        }, {
+            text: "Don't be afraid to give up the good to go for the great.",
+            author: "John D. Rockefeller"
+        }, {
+            text: "I find that the harder I work, the more luck I seem to have.",
+            author: "Thomas Jefferson"
+        }];
+
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        const newQuoteButton = document.getElementById('new-quote');
+        const tweetQuoteButton = document.getElementById('tweet-quote');
+
+        // Get a random quote
+        function getRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            return quotes[randomIndex];
+        }
+
+        // Display a new quote with animation
+        function displayQuote() {
+            const quote = getRandomQuote();
+
+            // Remove fade-in class for re-triggering animation
+            quoteText.classList.remove('fade-in');
+            quoteAuthor.classList.remove('fade-in');
+
+            // Force reflow
+            void quoteText.offsetWidth;
+            void quoteAuthor.offsetWidth;
+
+            // Update text and add animation class back
+            quoteText.textContent = `"${quote.text}"`;
+            quoteAuthor.textContent = `— ${quote.author}`;
+
+            quoteText.classList.add('fade-in');
+            quoteAuthor.classList.add('fade-in');
+        }
+
+        // Tweet the current quote
+        function tweetQuote() {
+            const text = quoteText.textContent;
+            const author = quoteAuthor.textContent;
+            const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text + " " + author)}`;
+            window.open(tweetUrl, '_blank');
+        }
+
+        // Event listeners
+        newQuoteButton.addEventListener('click', displayQuote);
+        tweetQuoteButton.addEventListener('click', tweetQuote);
+
+        // Keyboard support
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                event.preventDefault(); // Prevent space from scrolling page
+                displayQuote();
+            }
+        });
+
+        // Display first quote when page loads
+        displayQuote();
+    </script>
+</body>
+
+</html>
